@@ -51,6 +51,7 @@ class Dumper:
         self.old = old
         self.images = images
         self.workers = workers
+        self.iswindow = False
         try:
             self.parse_metadata()
         except AssertionError:
@@ -78,13 +79,11 @@ class Dumper:
             partitions = []
             for image in self.images.split(","):
                 image = image.strip()
-                found = False
                 for dam_part in self.dam.partitions:
                     if dam_part.partition_name == image:
                         partitions.append(dam_part)
-                        found = True
                         break
-                if not found:
+                else:
                     print("Partition %s not found in image" % image)
 
         if len(partitions) == 0:
@@ -110,7 +109,6 @@ class Dumper:
             )
 
         self.payloadfile.close()
-
         self.multiprocess_partitions(partitions_with_ops)
         self.manager.stop()
 
