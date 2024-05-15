@@ -11,11 +11,25 @@ homepage = "https://github.com/nnsee/payload-dumper"
 payload_dumper = "payload_dumper:main"
 
 [tool.poetry.dependencies]
-python = "^3.10"
-httpx = "^0.20.0"
-protobuf = "^3.19.3"
-bsdiff4 = "^1.2.1"
-enlighten = "^1.12.2"
+python = ">=3.8"
+httpx = ">=0.25.0"
+protobuf = "<=3.20.3,>=3.20.0"
+bsdiff4 = ">=1.2.2"
+enlighten = ">=1.12.4"
+
+[tool.pylint.main]
+ignore-patterns = ["^\\.#"]
+
+py-version = "3.12"
+
+[tool.pylint.basic]
+no-docstring-rgx = "^_"
+
+[tool.pylint."messages control"]
+disable = ["raw-checker-failed", "bad-inline-option", "locally-disabled", "file-ignored", "suppressed-message", "useless-suppression", "deprecated-pragma", "use-symbolic-message-instead", "use-implicit-booleaness-not-comparison-to-string", "use-implicit-booleaness-not-comparison-to-zero"]
+
+[tool.pylint.variables]
+ignored-argument-names = "_.*|^ignored_|^unused_"
 
 [tool.pytest.ini_options]
 pythonpath = "src"

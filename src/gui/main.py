@@ -55,6 +55,7 @@ class MainWindow(QMainWindow):
         print(self._dumper.images)
         self._dumper.run()
 
+
 if __name__ == "__main__":
     app = QApplication([])
     window = MainWindow()

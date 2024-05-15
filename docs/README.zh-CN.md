@@ -25,7 +25,7 @@ payload_dumper --partitions <partitions you need> <file path or url>
 
 ### Requirements
 
-- Python3
+- Python3 ≥ 3.8
 - pip
 
 ## Usage

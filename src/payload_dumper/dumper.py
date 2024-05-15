@@ -5,7 +5,7 @@ import io
 import lzma
 import struct
 import sys
-import zipfile
+import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from multiprocessing import cpu_count
 
@@ -14,6 +14,11 @@ from enlighten import get_manager
 
 from payload_dumper import http_file
 from payload_dumper import update_metadata_pb2 as um
+
+if sys.version_info > (3, 12):
+    import zipfile
+else:
+    from payload_dumper import fix_zipfile as zipfile
 
 flatten = lambda l: [item for sublist in l for item in sublist]
 
@@ -54,10 +59,10 @@ class Dumper:
         self.iswindow = False
         try:
             self.parse_metadata()
-        except AssertionError:
+        except ValueError:
             # try zip
-            with zipfile.ZipFile(self.payloadfile, "r") as zip_file:
-                self.payloadfile = zip_file.open("payload.bin", "r")
+            with zipfile.ZipFile(self.payloadfile) as zip_file:
+                self.payloadfile = zip_file.open("payload.bin")
             self.parse_metadata()
             pass
 
@@ -146,12 +151,15 @@ class Dumper:
     def parse_metadata(self):
         head_len = 4 + 8 + 8 + 4
         buffer = self.payloadfile.read(head_len)
-        assert len(buffer) == head_len
+        if len(buffer) != head_len:
+            raise ValueError
         magic = buffer[:4]
-        assert magic == b"CrAU"
+        if magic != bytearray(b"CrAU"):
+            raise ValueError
 
         file_format_version = u64(buffer[4:12])
-        assert file_format_version == 2
+        if file_format_version != 2:
+            raise ValueError
 
         manifest_size = u64(buffer[12:20])
 
