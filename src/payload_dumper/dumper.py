@@ -46,7 +46,15 @@ def verify_contiguous(exts):
 
 class Dumper:
     def __init__(
-        self, payloadfile, out, diff=None, old=None, images="", workers=cpu_count(), list_partitions=False, extract_metadata=False
+        self,
+        payloadfile,
+        out,
+        diff=None,
+        old=None,
+        images="",
+        workers=cpu_count(),
+        list_partitions=False,
+        extract_metadata=False,
     ):
         self.payloadfile = payloadfile
         self.manager = get_manager()
@@ -114,7 +122,7 @@ class Dumper:
 
         if len(partitions) == 0:
             print("Not operating on any partitions")
-            return 0
+            return 1
 
         partitions_with_ops = []
         for partition in partitions:
@@ -273,7 +281,9 @@ class Dumper:
     def list_partitions_info(self):
         partitions_info = []
         for partition in self.dam.partitions:
-            size_in_blocks = sum(ext.num_blocks for op in partition.operations for ext in op.dst_extents)
+            size_in_blocks = sum(
+                ext.num_blocks for op in partition.operations for ext in op.dst_extents
+            )
             size_in_bytes = size_in_blocks * self.block_size
             if size_in_bytes >= 1024**3:
                 size_str = f"{size_in_bytes / 1024**3:.1f}GB"
@@ -281,21 +291,26 @@ class Dumper:
                 size_str = f"{size_in_bytes / 1024**2:.1f}MB"
             else:
                 size_str = f"{size_in_bytes / 1024:.1f}KB"
-            
-            partitions_info.append({
-                "partition_name": partition.partition_name,
-                "size_in_blocks": size_in_blocks,
-                "size_in_bytes": size_in_bytes,
-                "size_readable": size_str
-            })
-        
+
+            partitions_info.append(
+                {
+                    "partition_name": partition.partition_name,
+                    "size_in_blocks": size_in_blocks,
+                    "size_in_bytes": size_in_bytes,
+                    "size_readable": size_str,
+                }
+            )
+
         # Output to JSON file
         output_file = os.path.join(self.out, "partitions_info.json")
         with open(output_file, "w") as f:
             json.dump(partitions_info, f, indent=4)
 
         # Print to console in a compact format
-        readable_info = ', '.join(f"{info['partition_name']}({info['size_readable']})" for info in partitions_info)
+        readable_info = ", ".join(
+            f"{info['partition_name']}({info['size_readable']})"
+            for info in partitions_info
+        )
         print(readable_info)
         print(f"\nPartition information saved to {output_file}")
 
@@ -305,7 +320,7 @@ class Dumper:
         try:
             with zipfile.ZipFile(self.payloadfile, "r") as zip_file:
                 with zip_file.open(metadata_path) as meta_file:
-                    metadata_content = meta_file.read().decode('utf-8')
+                    metadata_content = meta_file.read().decode("utf-8")
                     output_file = os.path.join(self.out, "metadata")
                     with open(output_file, "w") as f:
                         f.write(metadata_content)
